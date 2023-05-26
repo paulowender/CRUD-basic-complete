@@ -1,11 +1,15 @@
-import { db } from "../db.js";
+import db from "../db.js";
 
 export const getUsers = (_, res) => {
   const q = "SELECT * FROM usuarios";
 
+  // Buscando todos os usuários
   db.query(q, (err, data) => {
+
+    // Se der erro, retorna o erro
     if (err) return res.json(err);
 
+    // Retorna os usuários
     return res.status(200).json(data);
   });
 };
@@ -21,10 +25,20 @@ export const addUser = (req, res) => {
     req.body.data_nascimento,
   ];
 
-  db.query(q, [values], (err) => {
-    if (err) return res.json(err);
+  // Criando usuário no banco de dados
+  db.query(q, [values], (error, result) => {
 
-    return res.status(200).json("Usuário criado com sucesso.");
+    // Se der erro, retorna o erro
+    if (error) return res.json(error);
+
+    // Adiciona o id do usuario ao objeto
+    const id = result.insertId;
+
+    // Retorna a mensagem de sucesso e o usuário criado
+    return res.status(200).json({
+      message: "Usuário cadastrado com sucesso!",
+      id: id,
+    });
   });
 };
 
@@ -39,19 +53,29 @@ export const updateUser = (req, res) => {
     req.body.data_nascimento,
   ];
 
-  db.query(q, [...values, req.params.id], (err) => {
-    if (err) return res.json(err);
+  // Atualiza o usuário no banco de dados
+  db.query(q, [...values, req.params.id], (error) => {
 
-    return res.status(200).json("Usuário atualizado com sucesso.");
+    // Se der erro, retorna o erro
+    if (error) return res.json(error);
+
+    // Retorna a mensagem de sucesso
+    return res.status(200).json({
+      message: "Usuário atualizado com sucesso!",
+    });
   });
 };
 
 export const deleteUser = (req, res) => {
   const q = "DELETE FROM usuarios WHERE `id` = ?";
 
-  db.query(q, [req.params.id], (err) => {
-    if (err) return res.json(err);
+  // Deleta o usuário no banco de dados
+  db.query(q, [req.params.id], (error) => {
 
+    // Se der erro, retorna o erro
+    if (error) return res.json(error);
+
+    // Retorna a mensagem de sucesso
     return res.status(200).json("Usuário deletado com sucesso.");
   });
 };
